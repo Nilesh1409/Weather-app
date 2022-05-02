@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        
+        #container{
+            display: flex;
+        }
+        img{
+            width: 100px;
+        }
+        #container > div{
+        display: flex;
+        margin: 10px;
+        }
+        #container > div > div{
+            display: flex;
+        }
+        #container > div > div > p{
+            font-size: xx-large;
+            margin: 20px 0 0 5px;
+        }
+        #searchBar{
+            background-color: rgb(46, 46, 46);
+            height: 50px;
+        }
+        #input{
+            margin: 10px 5px 10px 10px ;
+            padding: 3px;
+        }
+        #btn{
+            color: rgb(135, 12, 12);
+            background: rgb(227, 40, 40);
+        }
+    </style>
+</head>
+<body>
+    <div id="searchBar">
+    <input id="input" type="text" placeholder="Type city...">
+    <input id="btn" type="submit">
+    </div>
+    <div id="container"></div>
+
+    <script>
+        let api = "fcd3036b54ecfa57d6a5c8977550c912";
+
+        document.getElementById("btn").addEventListener("click",func)
+       async function func(){
+           
+           let city = document.querySelector("#input").value;
+            let response = await fetch("http://api.openweathermap.org/geo/1.0/direct?q="+city+"&limit=1&appid="+api);
+            
+            let data = await response.json();
+            data.forEach(data => {
+                let lat = data.lat;
+                let lon = data.lon;
+                
+                async function apiData(lat,lon){
+                    let response = await fetch(" https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lon+"&appid="+api);
+                        let newData = await response.json();
+                        displayData(newData);
+                        
+                }
+                apiData(lat,lon);
+            });
+            
+            function displayData(newData){
+                document.getElementById("container").innerHTML = "";
+                document.getElementById("input").value = "";
+             let box = document.createElement("div");
+             let p = document.createElement("p").innerText = "CURRENT WEATHER";
+             
+             let div1 = document.createElement("div");
+             let imgDiv = document.createElement("div");
+             let img = document.createElement("img");
+             if(newData.weather[0].main === "Clouds"){
+               img.src = "https://free-images.com/sm/33ca/clouds_clouds_form_cloud.jpg";
+             }else{
+                img.src = "https://image.shutterstock.com/image-photo/heatwave-hot-sun-climate-change-260nw-1152324746.jpg"
+             }
+             let p2 = document.createElement("p")
+             p2.innerText = newData.weather[0].main;
+             imgDiv.append(img,p2);
+             let p3 = document.createElement("p");
+             p3.innerText = newData.clouds.all;
+             div1.append(imgDiv,p3);
+
+             let div2 = document.createElement("div");
+             let p4Div = document.createElement("div")
+             newData.sys.sunrise = new Date(newData.sys.sunrise);
+             let p4 =  document.createElement("p").innerText = "Sunrise :  "
+             let p5 =  document.createElement("p").innerText = newData.sys.sunrise
+             p4Div.append(p4,p5);
+
+             let p8Div = document.createElement("div")
+             newData.sys.sunset = new Date(newData.sys.sunset);
+             let p8 =  document.createElement("p").innerText = "Sunset :  "
+             let p9 =  document.createElement("p").innerText = newData.sys.sunset;
+             p8Div.append(p8,p9)
+
+             let p6Div = document.createElement("div")
+             newData.wind.speed = new Date(newData.wind.speed);
+             let p6 =  document.createElement("p").innerText = "Wind Speed :  "
+             let p7 =  document.createElement("p").innerText = newData.wind.speed;
+             p6Div.append(p6,p7)
+
+
+             div2.append(p4Div,p6Div,p8Div);
+
+             box.append(div1,div2);
+             document.querySelector("#container").append(box);
+
+            }
+
+
+        }
+    </script>
+</body>
+</html>
